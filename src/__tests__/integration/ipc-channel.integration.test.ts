@@ -1,6 +1,7 @@
 /**
  * Integration tests for IPC Channel registration and invocation.
  */
+
 import { WebContents } from 'electron'
 import { registerIPCHandlers, setTrustedSender } from '../../main/services/IPCService'
 
@@ -12,6 +13,16 @@ jest.mock('electron', () => ({
       mockHandlerMap.set(channel, handler)
     })
   }
+}))
+
+jest.mock('../../main/core/exploration/StateMachine', () => ({
+  ExplorationStateMachine: jest.fn().mockImplementation(() => ({
+    start: jest.fn(),
+    stop: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    on: jest.fn()
+  }))
 }))
 
 jest.mock('../../main/core/logger/Logger', () => ({
@@ -34,6 +45,10 @@ describe('IPC Channel Integration', () => {
   })
 
   describe('Happy Path', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development'
+    })
+
     it('should register all 4 exploration IPC handlers', () => {
       registerIPCHandlers()
       expect(mockHandlerMap.has('exploration:start')).toBe(true)
@@ -45,28 +60,28 @@ describe('IPC Channel Integration', () => {
     it('should return success from start handler', async () => {
       registerIPCHandlers()
       const handler = mockHandlerMap.get('exploration:start')!
-      const result = await handler({} as Electron.IpcMainInvokeEvent)
+      const result = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
       expect(result).toEqual({ success: true })
     })
 
     it('should return success from stop handler', async () => {
       registerIPCHandlers()
       const handler = mockHandlerMap.get('exploration:stop')!
-      const result = await handler({} as Electron.IpcMainInvokeEvent)
+      const result = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
       expect(result).toEqual({ success: true })
     })
 
     it('should return success from pause handler', async () => {
       registerIPCHandlers()
       const handler = mockHandlerMap.get('exploration:pause')!
-      const result = await handler({} as Electron.IpcMainInvokeEvent)
+      const result = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
       expect(result).toEqual({ success: true })
     })
 
     it('should return success from resume handler', async () => {
       registerIPCHandlers()
       const handler = mockHandlerMap.get('exploration:resume')!
-      const result = await handler({} as Electron.IpcMainInvokeEvent)
+      const result = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
       expect(result).toEqual({ success: true })
     })
   })
@@ -123,12 +138,16 @@ describe('IPC Channel Integration', () => {
   })
 
   describe('Multiple sequential calls', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development'
+    })
+
     it('should handle multiple calls on same channel', async () => {
       registerIPCHandlers()
       const handler = mockHandlerMap.get('exploration:start')!
-      const result1 = await handler({} as Electron.IpcMainInvokeEvent)
-      const result2 = await handler({} as Electron.IpcMainInvokeEvent)
-      const result3 = await handler({} as Electron.IpcMainInvokeEvent)
+      const result1 = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
+      const result2 = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
+      const result3 = await handler({ sender: { id: 1 } as any } as Electron.IpcMainInvokeEvent)
       expect(result1).toEqual({ success: true })
       expect(result2).toEqual({ success: true })
       expect(result3).toEqual({ success: true })
