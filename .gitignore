@@ -49,3 +49,6 @@ coverage/
 
 # Electron
 out/
+
+# Test reports
+reports/
