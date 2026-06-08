@@ -82,7 +82,14 @@ export class DFSExplorer extends EventEmitter {
     this.startTime = Date.now()
     this.initialized = true
     this.recordVisit(activityName, uiTree)
-    this.emit('initialize', { activityName, treeHash: TreeHasher.hash(uiTree) })
+    const hash = TreeHasher.hash(uiTree)
+    this.visitedHashes.add(hash)
+    this.dfsStack.push({
+      treeHash: hash,
+      interactableElements: this.extractClickableElements(uiTree),
+      nextElementIndex: 0
+    })
+    this.emit('initialize', { activityName, treeHash: hash })
   }
 
   /**
@@ -126,12 +133,12 @@ export class DFSExplorer extends EventEmitter {
       return { type: 'STOP', reason: 'DFS complete - all paths explored' }
     }
 
-    if (!topFrame || topFrame.treeHash !== currentHash) {
-      // Boundary: max depth - only check when pushing a new frame
-      if (this.dfsStack.length >= this.config.maxDepth) {
-        return { type: 'STOP', reason: `Max depth reached (${this.config.maxDepth})` }
-      }
+    // Boundary: max depth
+    if (this.dfsStack.length > this.config.maxDepth) {
+      return { type: 'STOP', reason: `Max depth reached (${this.config.maxDepth})` }
+    }
 
+    if (!topFrame || topFrame.treeHash !== currentHash) {
       currentFrame = {
         treeHash: currentHash,
         interactableElements: elements,

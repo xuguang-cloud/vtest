@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -35,12 +35,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -60,12 +60,12 @@ jobs:
     needs: [lint, typecheck]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -90,12 +90,12 @@ jobs:
     needs: [lint, typecheck]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -115,12 +115,12 @@ jobs:
     needs: [unit-test]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -139,12 +139,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -175,12 +175,12 @@ jobs:
     needs: [lint, typecheck, unit-test, integration-test, security]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -204,12 +204,12 @@ jobs:
     needs: [lint, typecheck, unit-test, integration-test, security]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -233,12 +233,12 @@ jobs:
     needs: [lint, typecheck, unit-test, integration-test, security]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
