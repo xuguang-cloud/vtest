@@ -7,7 +7,7 @@ export default {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/__tests__/acceptance/',
-    '/__tests__/integration/',
+    // integration tests now included
   ],
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/src/$1',
