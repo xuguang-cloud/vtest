@@ -32,7 +32,6 @@ import {
   BugSeverity,
   BugClassificationResult,
   BugClassificationSummary,
-  BugEvidenceRef,
   StructuralComparisonResult,
   VisualComparisonResult,
   UnmatchedRequirement,

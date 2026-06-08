@@ -28,7 +28,7 @@ describe('CheckpointManager', () => {
     jest.doMock('../../database/connection', () => ({
       getDatabase: () => mockDb
     }));
-/    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const module = require('../CheckpointManager');
     CheckpointManager = module.CheckpointManager;
   });
