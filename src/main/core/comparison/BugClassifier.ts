@@ -32,6 +32,7 @@ import {
   BugSeverity,
   BugClassificationResult,
   BugClassificationSummary,
+  // BugEvidenceRef, — re-exported via contract
   StructuralComparisonResult,
   VisualComparisonResult,
   UnmatchedRequirement,

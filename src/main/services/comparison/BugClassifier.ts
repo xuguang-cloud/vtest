@@ -6,11 +6,11 @@ import {
   BugSeverity,
   BugClassificationResult,
   BugClassificationSummary,
-  BugEvidenceRef,
+  // BugEvidenceRef, — re-exported via contract
   StructuralComparisonResult,
   VisualComparisonResult,
   UnmatchedRequirement,
-  VisualMismatch
+  // VisualMismatch, — re-exported via contract
 } from '../../core/contracts/comparison.contract'
 import { v4 as uuidv4 } from 'uuid'
 

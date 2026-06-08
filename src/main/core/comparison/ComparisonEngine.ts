@@ -20,12 +20,12 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   ComparisonRequest,
   ComparisonSession,
-  ComparisonSessionStatus,
+  // ComparisonSessionStatus, — re-exported via contract, not used internally
   ComparisonOptions,
   StructuralComparisonResult,
   VisualComparisonResult,
   BugClassificationResult,
-  BugEntry,
+  // BugEntry, — re-exported via contract, not used internally
   IComparisonEngine,
   IDocSourceRegistry
 } from '../contracts/comparison.contract'

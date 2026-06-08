@@ -116,9 +116,9 @@ export class VisualComparer {
    * a deterministic mock for TDD green phase.
    */
   private runPixelmatch(
-    actual: Buffer,
-    expected: Buffer,
-    threshold: number
+    _actual: Buffer,
+    _expected: Buffer,
+    _threshold: number
   ): PixelmatchResult {
     // TODO: Replace with real pixelmatch call in integration phase
     // pixelmatch(actual, expected, diffOutput, width, height, { threshold })

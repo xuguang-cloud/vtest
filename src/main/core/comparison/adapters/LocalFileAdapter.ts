@@ -37,9 +37,10 @@ export class LocalFileAdapter implements DocSourceAdapter {
   }
 
   async fetchPRD(config: Record<string, unknown>): Promise<PRDRequirement[]> {
-    const localConfig = config as LocalFileConfig
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _localConfig = config as LocalFileConfig
 
-    // In production: fs.readFileSync(localConfig.prdFilePath) + JSON.parse
+    // In production: fs.readFileSync(_localConfig.prdFilePath) + JSON.parse
     // For TDD green phase: return mock requirements
     return [
       {

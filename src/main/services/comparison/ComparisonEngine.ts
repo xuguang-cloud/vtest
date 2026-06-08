@@ -5,7 +5,7 @@ import {
   ComparisonRequest,
   ComparisonOptions,
   ComparisonSession,
-  ComparisonSessionStatus,
+  // ComparisonSessionStatus, — re-exported via contract
   IComparisonEngine,
   StructuralComparisonResult,
   VisualComparisonResult,

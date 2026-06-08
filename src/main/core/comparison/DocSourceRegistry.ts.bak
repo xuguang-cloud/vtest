@@ -10,7 +10,7 @@ import {
   DocSourceAdapter,
   DocSourceType,
   IDocSourceRegistry,
-  // ConfigValidationResult, — re-exported via contract
+  ConfigValidationResult,
   PRDRequirement,
   DesignAsset
 } from '../contracts/comparison.contract'
