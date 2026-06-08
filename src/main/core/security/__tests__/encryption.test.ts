@@ -1,7 +1,7 @@
+jest.mock('../../logger/Logger');
+
 import { encryptToken, decryptToken, generateState, generateCodeVerifier, EncryptedData } from '../encryption';
 import crypto from 'crypto';
-
-jest.mock('../../logger/Logger');
 
 describe('Security Encryption Module', () => {
   describe('AES-256-GCM Envelope Encryption', () => {
@@ -16,7 +16,8 @@ describe('Security Encryption Module', () => {
     it('如果业务数据 authTag 被篡改，解密应抛出异常', () => {
       const originalToken = 'tamper_test_token';
       const encrypted = encryptToken(originalToken);
-      const tamperedEncrypted: EncryptedData = { ...encrypted, authTag: crypto.randomBytes(16).toString('hex') };
+      // Generate a valid 16-byte auth tag (base64 encoded = 24 chars)
+      const tamperedEncrypted: EncryptedData = { ...encrypted, authTag: crypto.randomBytes(16).toString('base64') };
       expect(() => decryptToken(tamperedEncrypted)).toThrow('Failed to decrypt token');
     });
   });

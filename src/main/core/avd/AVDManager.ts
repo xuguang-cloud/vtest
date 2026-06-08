@@ -1,20 +1,8 @@
 import { spawn, ChildProcess } from 'child_process'
 import { EventEmitter } from 'events'
+import { AVDConfig, AVDStatus } from '../contracts/avd.contract'
 
-export interface AVDConfig {
-  name: string
-  device: string
-  apiLevel: number
-  screenSize: string
-  screenDensity: string
-}
-
-export interface AVDStatus {
-  name: string
-  state: 'stopped' | 'starting' | 'running' | 'error'
-  pid?: number
-  error?: string
-}
+export { AVDConfig, AVDStatus }
 
 export class AVDManager extends EventEmitter {
   private avdProcess: ChildProcess | null = null

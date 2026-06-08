@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import { AsyncMutex } from './AsyncMutex'
 
 export interface HeartbeatStatus {
   isAlive: boolean
@@ -20,7 +21,7 @@ export class HeartbeatManager extends EventEmitter {
     lastHeartbeat: 0,
     consecutiveFailures: 0
   }
-  private isChecking = false
+  private mutex = new AsyncMutex()
   private checkCount = 0
 
   constructor(
@@ -41,6 +42,8 @@ export class HeartbeatManager extends EventEmitter {
       consecutiveFailures: 0
     }
 
+    this.check()
+
     this.intervalId = setInterval(() => {
       this.check()
     }, this.config.interval)
@@ -60,11 +63,11 @@ export class HeartbeatManager extends EventEmitter {
   }
 
   private async check(): Promise<void> {
-    if (this.isChecking) {
+    if (this.mutex.isLocked()) {
       return
     }
 
-    this.isChecking = true
+    await this.mutex.acquire()
     this.checkCount++
 
     try {
@@ -104,11 +107,15 @@ export class HeartbeatManager extends EventEmitter {
         this.emit('failure', this.status)
       }
     } finally {
-      this.isChecking = false
+      this.mutex.release()
     }
   }
 
   private handleTimeout(): void {
+    if (this.mutex.isLocked()) {
+      return
+    }
+
     this.timeoutId = null
     this.status.isAlive = false
     this.status.consecutiveFailures++

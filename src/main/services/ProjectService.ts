@@ -1,38 +1,11 @@
 import { getDatabase } from '../core/database/connection'
 import { Logger } from '../core/logger/Logger'
+import { Project, CreateProjectDTO, UpdateProjectDTO } from '../core/contracts/project.contract'
 import { v4 as uuidv4 } from 'uuid'
 
 const logger = Logger.getLogger('project')
 
-export interface Project {
-  id: string
-  uuid: string
-  name: string
-  description?: string
-  apkPath?: string
-  prdPath?: string
-  designPath?: string
-  status: 'active' | 'inactive'
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface CreateProjectDTO {
-  name: string
-  description?: string
-  apkPath?: string
-  prdPath?: string
-  designPath?: string
-}
-
-export interface UpdateProjectDTO {
-  name?: string
-  description?: string
-  apkPath?: string
-  prdPath?: string
-  designPath?: string
-  status?: 'active' | 'inactive'
-}
+export { Project, CreateProjectDTO, UpdateProjectDTO }
 
 export class ProjectService {
   public async createProject(dto: CreateProjectDTO): Promise<Project> {

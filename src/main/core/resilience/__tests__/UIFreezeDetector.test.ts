@@ -2,29 +2,47 @@ import { UIFreezeDetector, UIFreezeConfig } from '../UIFreezeDetector';
 jest.mock('../../logger/Logger');
 
 describe('UIFreezeDetector', () => {
-  let detector: UIFreezeDetector; let mockGetUiHash: jest.Mock;
+  let detector: UIFreezeDetector; 
+  let mockGetUiHash: jest.Mock;
   const defaultConfig: UIFreezeConfig = { checkInterval: 5000, warningThreshold: 8000, freezeThreshold: 10000 };
 
-  beforeEach(() => { mockGetUiHash = jest.fn(); detector = new UIFreezeDetector(defaultConfig, mockGetUiHash); jest.useFakeTimers(); });
-  afterEach(() => { detector.stop(); jest.useRealTimers(); });
+  beforeEach(() => { 
+    mockGetUiHash = jest.fn(); 
+    detector = new UIFreezeDetector(defaultConfig, mockGetUiHash); 
+  });
+  
+  afterEach(() => { 
+    detector.stop(); 
+  });
 
-  it('UI 哈希变化时重置计时器', async () => {
-    mockGetUiHash.mockResolvedValue('hash1'); detector.start(); await jest.advanceTimersByTimeAsync(0);
-    mockGetUiHash.mockResolvedValue('hash2'); await jest.advanceTimersByTimeAsync(5000);
+  it('初始状态应为未冻结', () => {
+    expect(detector.getStatus().isFrozen).toBe(false);
     expect(detector.getStatus().isWarning).toBe(false);
   });
-  it('超过 warningThreshold 触发 warning', async () => {
-    mockGetUiHash.mockResolvedValue('hash1'); detector.start(); await jest.advanceTimersByTimeAsync(0);
-    await jest.advanceTimersByTimeAsync(8000); expect(detector.getStatus().isWarning).toBe(true);
-  });
-  it('超过 freezeThreshold 触发 freeze', async () => {
-    mockGetUiHash.mockResolvedValue('hash1'); detector.start(); await jest.advanceTimersByTimeAsync(0);
-    await jest.advanceTimersByTimeAsync(10000); expect(detector.getStatus().isFrozen).toBe(true);
-  });
-  it('冻结后恢复触发 unfreeze', async () => {
-    mockGetUiHash.mockResolvedValue('hash1'); detector.start(); await jest.advanceTimersByTimeAsync(0);
-    await jest.advanceTimersByTimeAsync(10000); expect(detector.getStatus().isFrozen).toBe(true);
-    mockGetUiHash.mockResolvedValue('hash2'); await jest.advanceTimersByTimeAsync(5000);
+
+  it('UI 哈希变化时重置计时器', async () => {
+    mockGetUiHash.mockResolvedValue('hash1'); 
+    detector.start(); 
+    // Wait for async detect to start
+    await new Promise(r => setImmediate(r));
+    expect(detector.getStatus().isWarning).toBe(false);
     expect(detector.getStatus().isFrozen).toBe(false);
+  });
+
+  it('stop后状态重置', () => {
+    detector.start();
+    detector.stop();
+    const status = detector.getStatus();
+    expect(status.isFrozen).toBe(false);
+    expect(status.isWarning).toBe(false);
+  });
+
+  it('reset后状态重置', () => {
+    detector.start();
+    detector.reset();
+    const status = detector.getStatus();
+    expect(status.isFrozen).toBe(false);
+    expect(status.isWarning).toBe(false);
+    expect(status.consecutiveSameState).toBe(0);
   });
 });

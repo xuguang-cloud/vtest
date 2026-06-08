@@ -1,6 +1,8 @@
 import { EventEmitter } from 'events'
 import { HeartbeatManager, HeartbeatConfig } from './HeartbeatManager'
+import { AsyncMutex } from './AsyncMutex'
 import { AVDManager } from '../avd/AVDManager'
+import { CheckpointManager, ExplorationSnapshot } from './CheckpointManager'
 
 export interface Checkpoint {
   id: string
@@ -20,6 +22,8 @@ export interface RecoveryStatus {
 
 export class RecoveryManager extends EventEmitter {
   private heartbeatManager: HeartbeatManager
+  private checkpointManager: CheckpointManager | null = null
+  private recoveryMutex = new AsyncMutex()
   private recoveryStatus: RecoveryStatus = {
     isRecovering: false,
     lastRecoveryTime: 0,
@@ -30,10 +34,14 @@ export class RecoveryManager extends EventEmitter {
 
   constructor(
     private avdManager: AVDManager,
-    heartbeatConfig: HeartbeatConfig
+    heartbeatConfig: HeartbeatConfig,
+    checkpointManager?: CheckpointManager
   ) {
     super()
     this.heartbeatManager = new HeartbeatManager(heartbeatConfig)
+    if (checkpointManager) {
+      this.checkpointManager = checkpointManager
+    }
     this.setupHeartbeatHandlers()
   }
 
@@ -56,9 +64,11 @@ export class RecoveryManager extends EventEmitter {
   }
 
   async triggerRecovery(): Promise<void> {
-    if (this.recoveryStatus.isRecovering) {
+    if (this.recoveryMutex.isLocked()) {
       return
     }
+
+    await this.recoveryMutex.acquire()
 
     this.recoveryStatus.isRecovering = true
     this.recoveryStatus.recoveryAttempts++
@@ -66,7 +76,8 @@ export class RecoveryManager extends EventEmitter {
     this.emit('recoveryStart', this.recoveryStatus)
 
     try {
-      const lastCheckpoint = this.getLastValidCheckpoint()
+      // Prefer database checkpoint (CheckpointManager) over in-memory checkpoint
+      const lastCheckpoint = await this.getBestCheckpoint()
 
       if (lastCheckpoint) {
         this.recoveryStatus.currentCheckpoint = lastCheckpoint
@@ -98,7 +109,31 @@ export class RecoveryManager extends EventEmitter {
     } finally {
       this.recoveryStatus.isRecovering = false
       this.emit('recoveryEnd', this.recoveryStatus)
+      this.recoveryMutex.release()
     }
+  }
+
+  private async getBestCheckpoint(): Promise<Checkpoint | undefined> {
+    // First try database checkpoint (persistent, survives crashes)
+    if (this.checkpointManager) {
+      try {
+        const dbCheckpoint = await this.checkpointManager.getLatestCheckpoint('current')
+        if (dbCheckpoint) {
+          return {
+            id: `db-${dbCheckpoint.stepIndex}`,
+            timestamp: Date.now(),
+            activity: dbCheckpoint.activityName,
+            uiTreeHash: dbCheckpoint.uiTreeHash,
+            path: dbCheckpoint.dfsStack
+          }
+        }
+      } catch {
+        // Database read failed, fall through to in-memory
+      }
+    }
+
+    // Fall back to in-memory checkpoint
+    return this.getLastValidCheckpoint()
   }
 
   saveCheckpoint(checkpoint: Omit<Checkpoint, 'id' | 'timestamp'>): Checkpoint {

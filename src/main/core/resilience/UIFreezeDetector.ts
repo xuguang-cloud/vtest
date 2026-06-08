@@ -19,6 +19,12 @@ export interface UIFreezeStatus {
   consecutiveSameState: number
 }
 
+export const DEFAULT_UI_FREEZE_CONFIG: UIFreezeConfig = {
+  checkInterval: 5000,
+  freezeThreshold: 10000,
+  warningThreshold: 8000
+}
+
 export class UIFreezeDetector extends EventEmitter {
   private intervalId: ReturnType<typeof setInterval> | null = null
   private status: UIFreezeStatus = {
@@ -30,7 +36,7 @@ export class UIFreezeDetector extends EventEmitter {
   private lastHash: string = ''
 
   constructor(
-    private config: UIFreezeConfig,
+    private config: UIFreezeConfig = DEFAULT_UI_FREEZE_CONFIG,
     private getUiHash: () => Promise<string> = async () => ''
   ) {
     super()

@@ -4,6 +4,7 @@ import { AppLifecycleManager } from './core/lifecycle/AppLifecycleManager'
 import { IPCBridge } from './core/bridge/IPCBridge'
 import { ExplorationStateMachine } from './core/exploration/StateMachine'
 import { mainLogger as logger } from './core/logger/Logger'
+import { registerIPCHandlers, setTrustedSender } from './services/IPCService'
 
 const lifecycleManager = new AppLifecycleManager()
 const stateMachine = new ExplorationStateMachine()
@@ -14,11 +15,20 @@ async function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js')
+      preload: join(__dirname, '../preload/index.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false
     }
   })
-  
+
   ipcBridge.setWindow(mainWindow)
+
+  // 设置受信任的 IPC 发送者
+  setTrustedSender(mainWindow.webContents)
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5173')
@@ -29,10 +39,10 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   try {
-    await lifecycleManager.onAppReady() // 触发崩溃恢复检查
+    await lifecycleManager.onAppReady()
     createWindow()
-    // 注册 IPC Handler
-    require('./services/IPCService')
+    // 注册安全的 IPC 处理器
+    registerIPCHandlers()
     logger.info('Application initialized successfully')
   } catch (error) {
     logger.fatal('Failed to initialize application', { error })

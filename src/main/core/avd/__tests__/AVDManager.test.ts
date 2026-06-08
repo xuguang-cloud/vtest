@@ -15,13 +15,17 @@ describe('AVDManager', () => {
 
   describe('listAVDs', () => {
     it('should return list of AVDs', async () => {
-      const mockStdout = { on: jest.fn() };
-      const mockClose = { on: jest.fn() };
-      mockSpawn.mockReturnValue({ stdout: mockStdout, on: mockClose } as any);
+      const mockProcess = {
+        stdout: { on: jest.fn() },
+        on: jest.fn()
+      };
+      mockSpawn.mockReturnValue(mockProcess as any);
 
       setTimeout(() => {
-        mockStdout.on.mock.calls.find(c => c[0] === 'data')?.[1](Buffer.from('avd1\navd2\n'));
-        mockClose.mock.calls.find(c => c[0] === 'close')?.[1](0);
+        const dataCallback = mockProcess.stdout.on.mock.calls.find((c: any) => c[0] === 'data')?.[1];
+        const closeCallback = mockProcess.on.mock.calls.find((c: any) => c[0] === 'close')?.[1];
+        if (dataCallback) dataCallback(Buffer.from('avd1\navd2\n'));
+        if (closeCallback) closeCallback(0);
       }, 0);
 
       const avds = await manager.listAVDs();
