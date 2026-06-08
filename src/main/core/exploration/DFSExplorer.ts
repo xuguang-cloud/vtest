@@ -95,13 +95,18 @@ export class DFSExplorer extends EventEmitter {
     this.stepCount++
 
     // Boundary: max steps
-    if (this.stepCount > this.config.maxSteps) {
+    if (this.stepCount >= this.config.maxSteps) {
       return { type: 'STOP', reason: `Max steps reached (${this.config.maxSteps})` }
     }
 
     // Boundary: max time
     if (Date.now() - this.startTime > this.config.maxTime) {
       return { type: 'STOP', reason: `Max time reached (${this.config.maxTime}ms)` }
+    }
+
+    // If we've backtracked to root and stack is empty, exploration complete
+    if (!this.initialized) {
+      return { type: 'STOP', reason: 'Not initialized' }
     }
 
     const currentHash = TreeHasher.hash(uiTree)
@@ -116,6 +121,10 @@ export class DFSExplorer extends EventEmitter {
     // Check if this is a new page we haven't seen before in this branch
     const topFrame = this.dfsStack.length > 0 ? this.dfsStack[this.dfsStack.length - 1] : null
     let currentFrame: DFSFrame
+
+    if (this.dfsStack.length === 0) {
+      return { type: 'STOP', reason: 'DFS complete - all paths explored' }
+    }
 
     if (!topFrame || topFrame.treeHash !== currentHash) {
       // Boundary: max depth - only check when pushing a new frame
@@ -143,10 +152,6 @@ export class DFSExplorer extends EventEmitter {
 
     // All elements on this page visited → backtrack
     this.dfsStack.pop()
-
-    if (this.dfsStack.length === 0) {
-      return { type: 'STOP', reason: 'DFS complete - all paths explored' }
-    }
 
     return { type: 'BACK' }
   }
