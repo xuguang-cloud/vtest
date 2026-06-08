@@ -2,7 +2,6 @@ import { getDatabase } from '../core/database/connection'
 import { Logger } from '../core/logger/Logger'
 import { TestCase, TestStep } from '../core/contracts/test-execution.contract'
 import { ExplorationPath } from '../core/contracts/exploration.contract'
-import { v4 as uuidv4 } from 'uuid'
 
 const logger = Logger.getLogger('test-case')
 

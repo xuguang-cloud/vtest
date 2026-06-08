@@ -1,5 +1,4 @@
 import { ExplorationService } from '../ExplorationService'
-import { Logger } from '../../core/logger/Logger'
 
 jest.mock('../../core/logger/Logger', () => ({
   Logger: {

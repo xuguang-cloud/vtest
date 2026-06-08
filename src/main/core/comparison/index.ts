@@ -1,0 +1,5 @@
+export { ComparisonEngine } from './ComparisonEngine'
+export { StructuralComparer } from './StructuralComparer'
+export { VisualComparer } from './VisualComparer'
+export { BugClassifier } from './BugClassifier'
+export { DocSourceRegistry, docSourceRegistry } from './DocSourceRegistry'

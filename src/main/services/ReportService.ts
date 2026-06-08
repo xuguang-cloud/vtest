@@ -200,7 +200,7 @@ export class ReportService {
 </html>`
   }
 
-  private buildPDFContent(report: ExecutionReport, config: ReportConfig): string {
+  private buildPDFContent(report: ExecutionReport, _config: ReportConfig): string {
     return this.getReportSummary(report)
   }
 }

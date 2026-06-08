@@ -10,10 +10,10 @@ export class TestExecutor {
   private crashed = false
   private logs = ''
 
-  async execute(steps: TestStepAction[], device: DeviceInfo): Promise<ExecutionResult> {
+  async execute(steps: TestStepAction[], _device: DeviceInfo): Promise<ExecutionResult> {
     const startTime = new Date().toISOString()
     const stepResults: StepResult[] = []
-    let allPassed = true
+    const allPassed = true
 
     for (let i = 0; i < steps.length; i++) {
       const screenshot = await this.captureScreenshot()

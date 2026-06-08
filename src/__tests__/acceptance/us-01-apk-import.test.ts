@@ -2,7 +2,7 @@
  * US-01: APK Import and Parse - Acceptance-Level TDD Tests
  */
 
-import { APKInfo, APKUploadResult } from '../../main/core/contracts/apk.contract'
+import { APKUploadResult } from '../../main/core/contracts/apk.contract'
 import { parseAPK, validateAPKFile, APKParseError } from '../../main/services/APKParserService'
 
 function createMockApkBuffer(size: number): Buffer {

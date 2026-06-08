@@ -83,7 +83,7 @@ describe('ApkService (US-01: APK导入与解析)', () => {
     })
 
     it('should return error when file does not exist', async () => {
-      ;(fs.existsSync as jest.Mock).mockReturnValue(false)
+      (fs.existsSync as jest.Mock).mockReturnValue(false)
       
       const result = await service.uploadAndParseAPK({
         filePath: '/nonexistent/test.apk',
@@ -123,7 +123,7 @@ describe('ApkService (US-01: APK导入与解析)', () => {
     })
 
     it('should use default values when manifest info is missing', async () => {
-      ;(fs.statSync as jest.Mock).mockReturnValue({ size: 512 })
+      (fs.statSync as jest.Mock).mockReturnValue({ size: 512 })
       ;(fs.readFileSync as jest.Mock).mockReturnValue(Buffer.from('some binary content'))
       
       const result = await service.parseAPKInfo('/tmp/unknown.apk')

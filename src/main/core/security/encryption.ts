@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import { mainLogger as logger } from '../logger/Logger'
 
 const ALGORITHM = 'aes-256-gcm'
 const KEY_LENGTH = 32

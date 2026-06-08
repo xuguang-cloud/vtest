@@ -1,5 +1,6 @@
 import React from 'react'
 import { useExplorationEngine } from '../hooks/useExplorationEngine'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ExplorationState } from '../hooks/useExplorationEngine'
 
 export const ExplorationMonitor: React.FC = () => {

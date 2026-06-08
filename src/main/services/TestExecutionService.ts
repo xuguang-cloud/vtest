@@ -196,7 +196,7 @@ export class TestExecutionService extends EventEmitter {
   /**
    * Generate screenshot comparison
    */
-  public async compareScreenshots(expectedPath: string, actualPath: string): Promise<{ match: boolean; diff: number }> {
+  public async compareScreenshots(_expectedPath: string, _actualPath: string): Promise<{ match: boolean; diff: number }> {
     // Mock implementation for testing
     return { match: true, diff: 0 }
   }

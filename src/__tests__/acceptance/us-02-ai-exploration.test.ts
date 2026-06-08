@@ -2,7 +2,7 @@
  * US-02: AI Exploration and Path Generation - Acceptance-Level TDD Tests
  */
 
-import { ExplorationPath } from '../../main/core/contracts/exploration.contract'
+
 import { ExplorationEngine } from '../../main/services/ExplorationEngine'
 
 describe('US-02: AI Exploration and Path Generation', () => {

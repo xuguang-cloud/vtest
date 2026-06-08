@@ -1,5 +1,5 @@
-import { RecoveryManager, Checkpoint } from '../RecoveryManager';
-import { HeartbeatManager, HeartbeatConfig } from '../HeartbeatManager';
+import { RecoveryManager } from '../RecoveryManager';
+import { HeartbeatManager } from '../HeartbeatManager';
 import { AVDManager } from '../../avd/AVDManager';
 
 jest.mock('../HeartbeatManager');

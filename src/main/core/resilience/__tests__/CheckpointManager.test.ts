@@ -1,14 +1,6 @@
 jest.mock('../../logger/Logger');
 
 // Create a mock database connection
-type MockDb = {
-  (tableName: string): MockDb;
-  insert(data: any): Promise<any>;
-  where(conditions: any): MockDb;
-  orderBy(column: string, direction: string): MockDb;
-  first(): Promise<any>;
-  del(): Promise<any>;
-};
 
 const createMockDb = (): any => {
   const mockDb = jest.fn() as any;
@@ -28,7 +20,7 @@ const createMockDb = (): any => {
 
 describe('CheckpointManager', () => {
   let CheckpointManager: any;
-  let ExplorationSnapshot: any;
+  let _ExplorationSnapshot: any;
 
   beforeAll(() => {
     // Define mock before requiring the module
@@ -36,6 +28,7 @@ describe('CheckpointManager', () => {
     jest.doMock('../../database/connection', () => ({
       getDatabase: () => mockDb
     }));
+/    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const module = require('../CheckpointManager');
     CheckpointManager = module.CheckpointManager;
   });
@@ -43,6 +36,7 @@ describe('CheckpointManager', () => {
   afterAll(() => {
     jest.dontMock('../../database/connection');
   });
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
 
   it('should be defined', () => {
     expect(CheckpointManager).toBeDefined();

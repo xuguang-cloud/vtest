@@ -57,6 +57,7 @@ describe('Database Integration', () => {
       table.timestamps(true, true)
     })
 
+/    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const connectionModule = require('../../main/core/database/connection')
     jest.spyOn(connectionModule, 'getDatabase').mockReturnValue(db)
 

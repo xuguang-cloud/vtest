@@ -1,4 +1,4 @@
-import { Logger, LogLevel } from '../Logger';
+import { Logger } from '../Logger';
 
 describe('Logger', () => {
   describe('getLogger', () => {

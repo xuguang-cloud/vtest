@@ -91,7 +91,7 @@ describe('IPCBridge', () => {
   describe('window not set', () => {
     it('should handle transition without window set', () => {
       // Don't set window - just create a new bridge and transition
-      const newBridge = new IPCBridge(new ExplorationStateMachine())
+      const _newBridge = new IPCBridge(new ExplorationStateMachine())
       // Should not throw
       expect(() => {
         stateMachine.transition('INIT')

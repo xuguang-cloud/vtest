@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 import { HeartbeatManager, HeartbeatConfig } from './HeartbeatManager'
 import { AsyncMutex } from './AsyncMutex'
 import { AVDManager } from '../avd/AVDManager'
-import { CheckpointManager, ExplorationSnapshot } from './CheckpointManager'
+import { CheckpointManager } from './CheckpointManager'
 
 export interface Checkpoint {
   id: string
