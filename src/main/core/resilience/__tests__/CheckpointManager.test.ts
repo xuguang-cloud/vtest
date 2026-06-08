@@ -20,7 +20,6 @@ const createMockDb = (): any => {
 
 describe('CheckpointManager', () => {
   let CheckpointManager: any;
-  let _ExplorationSnapshot: any;
 
   beforeAll(() => {
     // Define mock before requiring the module
