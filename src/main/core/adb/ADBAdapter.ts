@@ -3,7 +3,7 @@
  * Implements IADBAdapter for TestExecutor integration.
  */
 import { spawn, execSync } from 'child_process'
-import { IADBAdapter } from './TestExecutor'
+import { IADBAdapter } from '../../services/TestExecutor'
 import { Logger } from '../logger/Logger'
 
 const logger = Logger.getLogger('adb')
@@ -28,14 +28,24 @@ async function execAdb(args: string[], timeout = 30000): Promise<string> {
         proc.stdout.on('data', (data: Buffer) => { stdout += data.toString() })
         proc.stderr.on('data', (data: Buffer) => { stderr += data.toString() })
 
+        const timeoutId = setTimeout(() => {
+          proc.kill('SIGKILL')
+          reject(new Error(`ADB command timed out after ${timeout}ms`))
+        }, timeout)
+
         proc.on('close', (code) => {
+          clearTimeout(timeoutId)
           if (code === 0) {
             resolve(stdout.trim())
           } else {
             reject(new Error(`ADB command failed (code ${code}): ${stderr.trim()}`))
           }
         })
-        proc.on('error', reject)
+        proc.on('error', (err) => {
+          clearTimeout(timeoutId)
+          proc.kill('SIGKILL')
+          reject(err)
+        })
       })
     } catch (err: any) {
       lastError = err
@@ -69,7 +79,13 @@ export class ADBAdapter implements IADBAdapter {
   }
 
   async inputText(text: string): Promise<void> {
-    const escaped = text.replace(/ /g, '%s').replace(/[()<>&|;]/g, '\\$&')
+    const escaped = text
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/'/g, "\\'")
+      .replace(/\$/g, '\\$')
+      .replace(/`/g, '\\`')
+      .replace(/ /g, '%s')
     await execAdb(this.adbArgs('shell', 'input', 'text', escaped))
   }
 

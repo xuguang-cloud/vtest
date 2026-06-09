@@ -13,7 +13,7 @@ export interface ExplorationSnapshot {
 }
 
 export class CheckpointManager {
-  public async saveCheckpoint(testRunId: string, snapshot: ExplorationSnapshot): Promise<void> {
+  public async saveCheckpoint(testRunId: string, snapshot: ExplorationSnapshot): Promise<boolean> {
     const db = getDatabase();
     try {
       const stateData = Buffer.from(JSON.stringify({ dfsStack: snapshot.dfsStack, visitedHashes: snapshot.visitedHashes }), 'utf-8');
@@ -22,8 +22,10 @@ export class CheckpointManager {
         activity_name: snapshot.activityName, ui_tree_hash: snapshot.uiTreeHash, state_data: stateData,
       });
       logger.debug(`Checkpoint saved for run ${testRunId} at step ${snapshot.stepIndex}`);
+      return true;
     } catch (error) {
-      logger.error(`Failed to save checkpoint: ${error}`); throw error;
+      logger.error(`Failed to save checkpoint: ${error}`);
+      return false;
     }
   }
 

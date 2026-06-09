@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-06-09T05:14:16.889Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/main/core/adb/ADBAdapter.ts",
+      "root_cause": "Had './TestExecutor'",
+      "fix": "Changed to '../../services/TestExecutor'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-09T05:14:16.889Z"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "session_id": "",
+  "started": "",
+  "files_read": {
+    "D:/Projects/vtest/src/main/core/exploration/ADBUITreeProvider.ts": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-09T05:00:29.545Z"
+    },
+    "D:/Projects/vtest/src/main/core/adb/ADBAdapter.ts": {
+      "count": 5,
+      "tokens": 1675,
+      "first_read": "2026-06-09T05:00:29.561Z"
+    },
+    "D:/Projects/vtest/src/main/core/exploration/ExplorationOrchestrator.ts": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-09T05:00:30.096Z"
+    },
+    "D:/Projects/vtest/src/main/core/exploration/DFSExplorer.ts": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-09T05:00:30.128Z"
+    },
+    "D:/Projects/vtest/src/main/core/resilience/CheckpointManager.ts": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-09T05:06:15.737Z"
+    },
+    "D:/Projects/vtest/src/main/core/exploration/__tests__/ExplorationOrchestrator.test.ts": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-09T05:23:37.136Z"
+    },
+    "D:/Projects/vtest/src/__tests__/e2e/full-pipeline.e2e.test.ts": {
+      "count": 4,
+      "tokens": 1396,
+      "first_read": "2026-06-09T05:25:46.070Z"
+    }
+  },
+  "files_written": [
+    {
+      "file": "D:/Projects/vtest/docs/plans/2026-06-08-5s-review.md",
+      "action": "create",
+      "tokens": 1541,
+      "at": "2026-06-09T05:01:53.933Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/adb/ADBAdapter.ts",
+      "action": "edit",
+      "tokens": 88,
+      "at": "2026-06-09T05:05:11.337Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/resilience/CheckpointManager.ts",
+      "action": "edit",
+      "tokens": 220,
+      "at": "2026-06-09T05:07:49.289Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/exploration/ExplorationOrchestrator.ts",
+      "action": "create",
+      "tokens": 2284,
+      "at": "2026-06-09T05:11:54.577Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/adb/ADBAdapter.ts",
+      "action": "edit",
+      "tokens": 30,
+      "at": "2026-06-09T05:14:16.887Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/adb/ADBAdapter.ts",
+      "action": "edit",
+      "tokens": 405,
+      "at": "2026-06-09T05:16:30.084Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/exploration/__tests__/ExplorationOrchestrator.test.ts",
+      "action": "create",
+      "tokens": 1119,
+      "at": "2026-06-09T05:24:52.711Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/__tests__/e2e/full-pipeline.e2e.test.ts",
+      "action": "edit",
+      "tokens": 122,
+      "at": "2026-06-09T05:26:41.458Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/__tests__/e2e/full-pipeline.e2e.test.ts",
+      "action": "edit",
+      "tokens": 16,
+      "at": "2026-06-09T05:34:02.032Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/exploration/ExplorationOrchestrator.ts",
+      "action": "edit",
+      "tokens": 134,
+      "at": "2026-06-09T05:36:35.091Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/main/core/exploration/__tests__/ExplorationOrchestrator.test.ts",
+      "action": "create",
+      "tokens": 1300,
+      "at": "2026-06-09T05:37:50.991Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/__tests__/e2e/full-pipeline.e2e.test.ts",
+      "action": "edit",
+      "tokens": 44,
+      "at": "2026-06-09T05:46:38.597Z"
+    },
+    {
+      "file": "D:/Projects/vtest/src/__tests__/e2e/full-pipeline.e2e.test.ts",
+      "action": "edit",
+      "tokens": 35,
+      "at": "2026-06-09T05:50:33.903Z"
+    }
+  ],
+  "edit_counts": {
+    "docs/plans/2026-06-08-5s-review.md": 1,
+    "src/main/core/adb/ADBAdapter.ts": 3,
+    "src/main/core/resilience/CheckpointManager.ts": 1,
+    "src/main/core/exploration/ExplorationOrchestrator.ts": 2,
+    "src/main/core/exploration/__tests__/ExplorationOrchestrator.test.ts": 2,
+    "src/__tests__/e2e/full-pipeline.e2e.test.ts": 4
+  },
+  "anatomy_hits": 0,
+  "anatomy_misses": 5,
+  "repeated_reads_warned": 8,
+  "cerebrum_warnings": 0,
+  "stop_count": 1
+}

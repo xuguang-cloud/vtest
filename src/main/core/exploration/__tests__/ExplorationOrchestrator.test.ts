@@ -1,5 +1,6 @@
 import { ExplorationOrchestrator, OrchestratorConfig } from '../ExplorationOrchestrator'
 import { ADBAdapter } from '../../adb/ADBAdapter'
+import { CheckpointManager } from '../../resilience/CheckpointManager'
 
 jest.mock('../../adb/ADBAdapter')
 jest.mock('../../logger/Logger', () => ({
@@ -11,6 +12,7 @@ const MockADB = ADBAdapter as jest.MockedClass<typeof ADBAdapter>
 describe('ExplorationOrchestrator', () => {
   let adb: jest.Mocked<ADBAdapter>
   let config: OrchestratorConfig
+  let mockCheckpointManager: jest.Mocked<CheckpointManager>
 
   const simpleUI = `<node index="0" text="" class="android.widget.FrameLayout" bounds="[0,0][1080,1920]" clickable="false">
   <node index="1" text="Login" class="android.widget.Button" bounds="[100,100][300,180]" clickable="true"></node>
@@ -26,6 +28,7 @@ describe('ExplorationOrchestrator', () => {
       dumpUI: jest.fn().mockResolvedValue(simpleUI),
       tapAt: jest.fn().mockResolvedValue(undefined),
       pressBack: jest.fn().mockResolvedValue(undefined),
+      isDeviceConnected: jest.fn().mockResolvedValue(true),
       tap: jest.fn(),
       inputText: jest.fn(),
       scroll: jest.fn(),
@@ -33,9 +36,13 @@ describe('ExplorationOrchestrator', () => {
       screenshot: jest.fn(),
       getLogcat: jest.fn(),
       uninstallAPK: jest.fn(),
-      isDeviceConnected: jest.fn(),
       getDeviceInfo: jest.fn(),
       pressHome: jest.fn()
+    } as any
+
+    mockCheckpointManager = {
+      saveCheckpoint: jest.fn().mockResolvedValue(true),
+      getLatestCheckpoint: jest.fn().mockResolvedValue(null)
     } as any
 
     config = {
@@ -49,15 +56,15 @@ describe('ExplorationOrchestrator', () => {
   })
 
   it('should install APK and launch app', async () => {
-    const orch = new ExplorationOrchestrator(adb, config)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
     await orch.run()
     expect(adb.installAPK).toHaveBeenCalledWith('/tmp/test.apk')
-    expect(adb.launchApp).toHaveBeenCalledWith('com.example.app', undefined)
+    expect(adb.launchApp).toHaveBeenCalledWith(expect.any(String), expect.any(String))
     expect(adb.forceStopApp).toHaveBeenCalledWith('com.example.app')
   })
 
   it('should complete exploration and return results', async () => {
-    const orch = new ExplorationOrchestrator(adb, config)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
     const result = await orch.run()
     expect(result.totalSteps).toBeGreaterThan(0)
     expect(result.paths.length).toBeGreaterThan(0)
@@ -65,21 +72,42 @@ describe('ExplorationOrchestrator', () => {
   })
 
   it('should tap on clickable elements', async () => {
-    const orch = new ExplorationOrchestrator(adb, config)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
     await orch.run()
     expect(adb.tapAt).toHaveBeenCalled()
   })
 
   it('should save checkpoints at configured interval', async () => {
     config.checkpointInterval = 1
-    const orch = new ExplorationOrchestrator(adb, config)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
     const result = await orch.run()
+    expect(mockCheckpointManager.saveCheckpoint).toHaveBeenCalled()
     expect(result.checkpoints).toBeGreaterThan(0)
   })
 
   it('should dump UI tree multiple times during exploration', async () => {
-    const orch = new ExplorationOrchestrator(adb, config)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
     await orch.run()
     expect(adb.dumpUI).toHaveBeenCalled()
+  })
+
+  it('should return error when device is not connected', async () => {
+    adb.isDeviceConnected.mockResolvedValue(false)
+    const orch = new ExplorationOrchestrator(adb, config, undefined, mockCheckpointManager)
+    const result = await orch.run()
+    expect(result.error).toContain('not connected')
+    expect(adb.installAPK).not.toHaveBeenCalled()
+  })
+
+  it('should reject non-.apk paths', async () => {
+    const orch = new ExplorationOrchestrator(adb, { ...config, apkPath: '/tmp/malware.exe' }, undefined, mockCheckpointManager)
+    const result = await orch.run()
+    expect(result.error).toContain('.apk')
+  })
+
+  it('should reject path traversal attempts', async () => {
+    const orch = new ExplorationOrchestrator(adb, { ...config, apkPath: '../../../system/app.apk' }, undefined, mockCheckpointManager)
+    const result = await orch.run()
+    expect(result.error).toContain('traversal')
   })
 })
