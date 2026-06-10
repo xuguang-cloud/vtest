@@ -1,10 +1,8 @@
 import React from 'react'
-import { useExplorationEngine } from '../hooks/useExplorationEngine'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ExplorationState } from '../hooks/useExplorationEngine'
+import { useExplorationEngine } from '../hooks/ExplorationContext'
 
 export const ExplorationMonitor: React.FC = () => {
-  const { currentState, startExploration } = useExplorationEngine()
+  const { currentState, startExploration, stopExploration, pauseExploration, resumeExploration, sessionId, error } = useExplorationEngine()
 
   const getStatusConfig = () => {
     switch (currentState) {
@@ -36,15 +34,49 @@ export const ExplorationMonitor: React.FC = () => {
 
         <div className="bg-slate-100 rounded-lg p-4 mb-6 font-mono text-sm text-slate-600">
           Current State: <span className="text-primary-600 font-bold">{currentState}</span>
+          {sessionId && <div className="mt-1">Session: <span className="font-bold">{sessionId}</span></div>}
         </div>
 
-        <button
-          onClick={startExploration}
-          disabled={isRunning}
-          className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-slate-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out"
-        >
-          启动自动探索
-        </button>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
+        {!isRunning && currentState !== 'DONE' && (
+          <button
+            onClick={startExploration}
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out"
+          >
+            启动自动探索
+          </button>
+        )}
+
+        {isRunning && (
+          <div className="flex space-x-3">
+            <button
+              onClick={pauseExploration}
+              className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out"
+            >
+              暂停
+            </button>
+            <button
+              onClick={stopExploration}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out"
+            >
+              停止
+            </button>
+          </div>
+        )}
+
+        {currentState === 'DONE' && (
+          <button
+            onClick={startExploration}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out"
+          >
+            重新探索
+          </button>
+        )}
       </div>
     </div>
   )

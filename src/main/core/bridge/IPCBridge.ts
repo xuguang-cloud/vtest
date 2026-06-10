@@ -1,11 +1,11 @@
 import { BrowserWindow } from 'electron'
-import { ExplorationStateMachine, ExplorationState } from '../exploration/StateMachine'
+import { StateMachine, ExplorationState } from '../exploration/StateMachine'
 import { mainLogger as logger } from '../logger/Logger'
 
 export class IPCBridge {
   private mainWindow: BrowserWindow | null = null
 
-  constructor(private stateMachine: ExplorationStateMachine) {
+  constructor(private stateMachine: StateMachine) {
     this.setupStateMachineListener()
   }
 

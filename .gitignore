@@ -35,6 +35,14 @@ database/
 
 # Work files
 .workbuddy/
+.wolf/
+
+# Runtime artifacts
+screenshots/
+recordings/
+exploration-report.md
+nul
+.codegraph/
 
 # Environment variables
 .env

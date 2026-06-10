@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const logger = Logger.getLogger('project')
 
-export { Project, CreateProjectDTO, UpdateProjectDTO }
+export type { Project, CreateProjectDTO, UpdateProjectDTO }
 
 export class ProjectService {
   public async createProject(dto: CreateProjectDTO): Promise<Project> {

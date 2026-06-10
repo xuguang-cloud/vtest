@@ -13,8 +13,32 @@ const ALLOWED_CHANNELS = new Set([
 
 let trustedSender: WebContents | null = null
 
+// Rate limiting
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_MAX = 30           // Max calls per window
+const RATE_LIMIT_WINDOW_MS = 60000   // 1 minute window
+const RATE_LIMIT_BURST = 10          // Max calls in 1 second
+
 export function setTrustedSender(sender: WebContents): void {
   trustedSender = sender
+}
+
+function checkRateLimit(senderId: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(senderId)
+  
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(senderId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+  
+  entry.count++
+  if (entry.count > RATE_LIMIT_MAX) {
+    logger.warn(`Rate limit exceeded for sender: ${senderId}`)
+    return false
+  }
+  
+  return true
 }
 
 function verifySender(event: Electron.IpcMainInvokeEvent): boolean {
@@ -49,6 +73,12 @@ function createSecureHandler<T>(
         logger.warn('Untrusted sender on channel: ' + channel)
         throw new Error('Untrusted sender')
       }
+      // Rate limiting
+      const senderId = event.sender.id.toString()
+      if (!checkRateLimit(senderId)) {
+        logger.warn(`IPC rate limit exceeded: ${channel} from sender ${senderId}`)
+        throw new Error('Rate limit exceeded')
+      }
       logger.info('Processing IPC: ' + channel)
       return await handler(event, ...args)
     } catch (error: any) {
@@ -60,19 +90,19 @@ function createSecureHandler<T>(
 
 export function registerIPCHandlers() {
   createSecureHandler('exploration:start', async () => {
-    stateMachine.start()
+    stateMachine.transition('INIT')
     return { success: true }
   })
   createSecureHandler('exploration:stop', async () => {
-    stateMachine.stop()
+    stateMachine.transition('IDLE')
     return { success: true }
   })
   createSecureHandler('exploration:pause', async () => {
-    stateMachine.pause()
+    stateMachine.transition('IDLE')
     return { success: true }
   })
   createSecureHandler('exploration:resume', async () => {
-    stateMachine.resume()
+    stateMachine.transition('EXPLORING')
     return { success: true }
   })
   logger.info('IPC handlers registered')

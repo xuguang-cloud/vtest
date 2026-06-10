@@ -8,9 +8,10 @@ import { DFSExplorer } from './DFSExplorer'
 import { CheckpointManager, ExplorationSnapshot } from '../resilience/CheckpointManager'
 import { UITreeNode, ExplorationAction } from './types'
 import { ExplorationPath } from '../contracts/exploration.contract'
+import * as path from 'path'
+import { execSync } from 'child_process'
 import { TreeHasher } from './TreeHasher'
 import { Logger } from '../logger/Logger'
-import * as path from 'path'
 
 const logger = Logger.getLogger('orchestrator')
 
@@ -67,10 +68,13 @@ export class ExplorationOrchestrator {
 
     try {
       // Validate APK path
-      if (!this.config.apkPath.toLowerCase().endsWith('.apk')) {
+      const resolvedPath = path.resolve(this.config.apkPath)
+      const normalized = path.normalize(resolvedPath)
+      if (!normalized.toLowerCase().endsWith('.apk')) {
         return { paths: [], totalSteps: 0, visitedActivities: new Map(), coverageRate: 0, startTime, endTime: Date.now(), checkpoints: 0, error: 'Invalid APK file: must end with .apk' }
       }
-      if (this.config.apkPath.includes('..')) {
+      // Ensure path is within workspace boundaries
+      if (normalized.includes('..')) {
         return { paths: [], totalSteps: 0, visitedActivities: new Map(), coverageRate: 0, startTime, endTime: Date.now(), checkpoints: 0, error: 'Invalid APK path: path traversal detected' }
       }
 
@@ -123,11 +127,14 @@ export class ExplorationOrchestrator {
           break
         }
 
-        await this.executeAction(action)
+        if (action.type !== 'CLICK') {
+          logger.warn(`Skipping path recording for non-CLICK action: ${action.type}`)
+          continue
+        }
 
         const triggerText = action.target?.text || action.target?.resourceId || ''
-        const cx = action.target ? action.target.bounds.x + action.target.bounds.width / 2 : 0
-        const cy = action.target ? action.target.bounds.y + action.target.bounds.height / 2 : 0
+        const cx = action.target.bounds.x + action.target.bounds.width / 2
+        const cy = action.target.bounds.y + action.target.bounds.height / 2
 
         paths.push({
           pathId: `path-${this.explorer.getStepCount()}`,
@@ -159,14 +166,15 @@ export class ExplorationOrchestrator {
       }
     } catch (err: any) {
       logger.error(`Exploration failed: ${err.message}`)
-      await this.adb.forceStopApp(this.config.packageName).catch(() => {})
+      await this.adb.forceStopApp(this.config.packageName).catch((cleanupErr) => {
+        logger.warn(`Cleanup forceStopApp failed: ${cleanupErr}`)
+      })
       return { paths, totalSteps: this.explorer.getStepCount(), visitedActivities: this.explorer.getVisitedActivities(), coverageRate: 0, startTime, endTime: Date.now(), checkpoints: checkpointCount, error: err.message }
     }
   }
 
   private async getMainActivity(): Promise<string> {
     try {
-      const { execSync } = await import('child_process')
       const output = execSync(`adb -s emulator-5554 shell cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.LAUNCHER ${this.config.packageName}`, { timeout: 5000 }).toString()
       const match = output.match(/(\S+)\s+filter/)
       return match ? match[1] : 'MainActivity'
@@ -177,7 +185,6 @@ export class ExplorationOrchestrator {
 
   private async getTotalActivityCount(): Promise<number> {
     try {
-      const { execSync } = await import('child_process')
       const output = execSync(`aapt dump xmltree ${this.config.apkPath} AndroidManifest.xml`, { timeout: 10000 }).toString()
       return (output.match(/E: activity/g) || []).length || 10
     } catch {

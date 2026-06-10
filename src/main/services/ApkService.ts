@@ -8,7 +8,7 @@ import * as path from 'path'
 
 const logger = Logger.getLogger('apk')
 
-export { APKInfo, APKUploadResult }
+export type { APKInfo, APKUploadResult }
 
 export interface ParseAPKOptions {
   filePath: string

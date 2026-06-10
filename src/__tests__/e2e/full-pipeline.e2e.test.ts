@@ -41,7 +41,6 @@ describe('E2E: Full exploration pipeline', () => {
       screenshot: jest.fn(),
       getLogcat: jest.fn(),
       uninstallAPK: jest.fn(),
-      isDeviceConnected: jest.fn().mockResolvedValue(true),
       getDeviceInfo: jest.fn(),
       pressHome: jest.fn()
     } as any

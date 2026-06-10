@@ -16,9 +16,11 @@ export interface TestStep {
   screenshot?: string
 }
 
+export type StepStatus = 'passed' | 'failed' | 'blocked' | 'error'
+
 export interface ExecutionResult {
   caseId: string
-  status: 'passed' | 'failed' | 'blocked'
+  status: 'passed' | 'failed' | 'blocked' | 'error'
   startTime: string
   endTime: string
   duration: number
@@ -28,8 +30,9 @@ export interface ExecutionResult {
 
 export interface StepResult {
   step: number
-  status: 'passed' | 'failed' | 'blocked'
+  status: StepStatus
   screenshot?: string
+  error?: string
 }
 
 export interface ExecutionReport {

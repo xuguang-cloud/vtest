@@ -2,7 +2,7 @@ import { spawn, ChildProcess } from 'child_process'
 import { EventEmitter } from 'events'
 import { AVDConfig, AVDStatus } from '../contracts/avd.contract'
 
-export { AVDConfig, AVDStatus }
+export type { AVDConfig, AVDStatus }
 
 export class AVDManager extends EventEmitter {
   private avdProcess: ChildProcess | null = null
@@ -42,13 +42,14 @@ export class AVDManager extends EventEmitter {
     }
 
     this.avdProcess = spawn('emulator', args)
+    const process = this.avdProcess
 
-    this.avdProcess.on('error', (err) => {
+    process.on('error', (err) => {
       this.status = { name: avdName, state: 'error', error: err.message }
       this.emit('statusChange', this.status)
     })
 
-    this.avdProcess.on('close', (code) => {
+    process.on('close', (code) => {
       if (code === 0) {
         this.status = { name: avdName, state: 'stopped' }
       } else {
@@ -57,15 +58,18 @@ export class AVDManager extends EventEmitter {
       this.emit('statusChange', this.status)
     })
 
-    this.avdProcess.stdout.on('data', (data) => {
-      const output = data.toString()
-      if (output.includes('boot completed')) {
-        this.status = { name: avdName, state: 'running', pid: this.avdProcess?.pid }
-        this.emit('statusChange', this.status)
-      }
-    })
-  }
-
+    // SAFETY: stdout may be null in some Node.js environments
+    const procStdout = process.stdout
+    if (procStdout) {
+      procStdout.on('data', (data: Buffer) => {
+        const output = data.toString()
+        if (output.includes('boot completed')) {
+          this.status = { name: avdName, state: 'running', pid: this.avdProcess?.pid }
+          this.emit('statusChange', this.status)
+        }
+      })
+    }
+}
   async stopAVD(): Promise<void> {
     if (!this.avdProcess) {
       return

@@ -10,6 +10,7 @@ describe('StructuralComparer', () => {
   })
 
   const createExplorationResult = (paths: any[]): ExplorationResult => ({
+    appPackage: 'com.test.app',
     paths: paths.map((p, i) => ({
       pathId: `path-${i}`,
       startActivity: p.startActivity || 'MainActivity',
@@ -18,11 +19,16 @@ describe('StructuralComparer', () => {
       coverage: p.coverage || [],
       duration: p.duration || 0,
       success: p.success !== false,
+      reproducible: true,
     })),
     totalPaths: paths.length,
-    exploredActivities: Array.from(new Set(paths.flatMap(p => [p.startActivity, p.endActivity]).filter(Boolean))),
-    startTime: new Date().toISOString(),
-    endTime: new Date().toISOString(),
+    coverageSummary: {
+      totalActivities: 0,
+      exploredActivities: Array.from(new Set(paths.flatMap(p => [p.startActivity, p.endActivity]).filter(Boolean))).length,
+      coverageRate: 0
+    },
+    explorationStart: new Date().toISOString(),
+    explorationEnd: new Date().toISOString(),
   })
 
   const createPRD = (overrides?: Partial<PRDRequirement>): PRDRequirement => ({

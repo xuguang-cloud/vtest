@@ -5,7 +5,7 @@ import { ExplorationPath } from '../core/contracts/exploration.contract'
 
 const logger = Logger.getLogger('test-case')
 
-export { TestCase, TestStep }
+export type { TestCase, TestStep }
 
 export interface GenerateTestCasesRequest {
   projectId: string

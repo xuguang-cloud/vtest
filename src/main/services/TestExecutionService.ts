@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const logger = Logger.getLogger('test-execution')
 
-export { TestCase, TestStep, StepResult, ExecutionResult, ExecutionReport, ExecutionSummary }
+export type { TestCase, TestStep, StepResult, ExecutionResult, ExecutionReport, ExecutionSummary }
 
 export interface RunTestRequest {
   projectId: string

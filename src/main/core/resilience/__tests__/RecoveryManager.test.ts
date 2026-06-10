@@ -13,8 +13,8 @@ describe('RecoveryManager', () => {
 
   beforeEach(() => {
     mockAVDManager = {
-      stopAVD: jest.fn().mockResolvedValue(),
-      startAVD: jest.fn().mockResolvedValue()
+      stopAVD: jest.fn().mockResolvedValue(undefined),
+      startAVD: jest.fn().mockResolvedValue(undefined)
     } as any;
 
     mockHeartbeatManager = {

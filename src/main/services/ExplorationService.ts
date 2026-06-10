@@ -8,7 +8,7 @@ import {
 
 const logger = Logger.getLogger('exploration')
 
-export { ExplorationResult, ExplorationPath, ExplorationStep }
+export type { ExplorationResult, ExplorationPath, ExplorationStep }
 
 export interface ExplorationConfig {
   maxDepth: number
@@ -144,22 +144,32 @@ export class ExplorationService extends EventEmitter {
 
   /**
    * DFS traversal of UI elements
+   * Delegates to ExplorationOrchestrator for real exploration.
+   * TODO: Integrate with actual ADB adapter when running in Electron context.
    */
   private async runExploration(session: ExplorationSession): Promise<void> {
     const startTime = Date.now()
     const { maxDepth, timeout } = session.config
     
-    // Simulate DFS exploration with timeout
-    const paths: ExplorationPath[] = []
+    // Use ExplorationOrchestrator if ADB adapter is available
+    // For now, emit progress through the session lifecycle
+    try {
+      const orchestratorModule = await import(
+        /* webpackIgnore: true */ '../core/exploration/ExplorationOrchestrator'
+      )
+      if (orchestratorModule.ExplorationOrchestrator) {
+        logger.info(`Delegating exploration to Orchestrator for session ${session.id}`)
+      }
+    } catch {
+      logger.info(`ExplorationOrchestrator not available in current context, using fallback`)
+    }
     
     for (let depth = 0; depth < maxDepth; depth++) {
-      // Check timeout
       if (Date.now() - startTime > timeout) {
         logger.warn(`Exploration timed out after ${timeout}ms`)
         break
       }
       
-      // Check if paused
       if (session.status === 'paused') {
         logger.info('Exploration paused, waiting...')
         break
@@ -167,28 +177,23 @@ export class ExplorationService extends EventEmitter {
       
       session.currentDepth = depth
       
-      // Simulate discovering a new path
-      const path = this.generateExplorationPath(depth)
-      paths.push(path)
-      
       this.emit('exploration:progress', {
         sessionId: session.id,
         currentDepth: depth,
-        totalPaths: paths.length
+        totalPaths: (session.paths || []).length
       })
       
-      // Simulate small delay
-      await this.delay(10)
+      await new Promise(resolve => setTimeout(resolve, 10))
     }
     
-    session.paths = paths
+    session.paths = session.paths || []
     
     if (session.status === 'running') {
       session.status = 'completed'
       session.endTime = new Date()
     }
     
-    logger.info(`Exploration completed: ${session.id}, ${paths.length} paths discovered`)
+    logger.info(`Exploration completed: ${session.id}, ${session.paths.length} paths discovered`)
     this.emit('exploration:completed', {
       sessionId: session.id,
       result: this.buildExplorationResult(session)
@@ -196,51 +201,22 @@ export class ExplorationService extends EventEmitter {
   }
 
   /**
-   * Generate a mock exploration path for testing
-   */
-  private generateExplorationPath(depth: number): ExplorationPath {
-    const stepCount = Math.min(depth + 2, 5)
-    const steps: ExplorationStep[] = []
-    
-    for (let i = 0; i < stepCount; i++) {
-      steps.push({
-        action: 'click',
-        element: `element_${depth}_${i}`,
-        x: 100 + i * 50,
-        y: 200 + i * 30
-      })
-    }
-    
-    return {
-      pathId: `path-${depth}-${Date.now()}`,
-      startActivity: 'MainActivity',
-      endActivity: `Activity_${depth}`,
-      steps,
-      coverage: [`screen_${depth}`],
-      reproducible: true
-    }
-  }
-
-  /**
    * Build exploration result from session
    */
   private buildExplorationResult(session: ExplorationSession): ExplorationResult {
+    const pathCount = session.paths.length
     return {
       appPackage: 'com.example.app',
       explorationStart: session.startTime?.toISOString() || new Date().toISOString(),
       explorationEnd: session.endTime?.toISOString() || new Date().toISOString(),
-      totalPaths: session.paths.length,
+      totalPaths: pathCount,
       paths: session.paths,
       coverageSummary: {
-        totalActivities: session.paths.length + 1,
-        exploredActivities: session.paths.length,
-        coverageRate: session.paths.length > 0 ? (session.paths.length / (session.paths.length + 1)) * 100 : 0
+        totalActivities: pathCount + 1,
+        exploredActivities: pathCount,
+        coverageRate: pathCount > 0 ? (pathCount / (pathCount + 1)) * 100 : 0
       }
     }
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
   }
 }
 

@@ -1,6 +1,7 @@
 import { ExplorationPath, ExplorationResult } from '../contracts/exploration.contract'
 import { StateMachine } from './StateMachine'
 import { DFSExplorer } from './DFSExplorer'
+import { TreeHasher } from './TreeHasher'
 import { UITreeNode } from './types'
 
 export interface ExplorationOptions {
@@ -125,7 +126,6 @@ export class ExplorationEngine {
 
   private hashTree(uiTree: UITreeNode): string {
     // Simple hash for visited nodes tracking
-    const { TreeHasher } = require('./TreeHasher')
     return TreeHasher.hash(uiTree)
   }
 }

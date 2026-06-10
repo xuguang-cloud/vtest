@@ -1,5 +1,5 @@
 import { IPCBridge } from '../IPCBridge'
-import { ExplorationStateMachine } from '../../exploration/StateMachine'
+import { StateMachine as ExplorationStateMachine } from '../../exploration/StateMachine'
 import { BrowserWindow } from 'electron'
 
 // Mock electron

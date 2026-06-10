@@ -123,8 +123,6 @@ export class TestExecutor {
       case 'wait':
         await new Promise(r => setTimeout(r, parseInt(step.value || '500')))
         break
-      case 'assert':
-        return await this.assertStep(step, index)
 
       default:
         throw new Error(`Unknown action: ${step.action}`)

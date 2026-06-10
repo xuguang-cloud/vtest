@@ -11,7 +11,7 @@ import {
   PRDRequirement,
   DesignAsset,
   ConfigValidationResult
-} from '../contracts/comparison.contract'
+} from '../../contracts/comparison.contract'
 
 export interface LocalFileConfig {
   /** Path to PRD JSON file */
@@ -27,7 +27,7 @@ export class LocalFileAdapter implements DocSourceAdapter {
 
   async validateConfig(config: Record<string, unknown>): Promise<ConfigValidationResult> {
     const errors: string[] = []
-    const localConfig = config as LocalFileConfig
+    const localConfig = config as unknown as LocalFileConfig
 
     if (!localConfig.prdFilePath) {
       errors.push('prdFilePath is required')
@@ -38,7 +38,7 @@ export class LocalFileAdapter implements DocSourceAdapter {
 
   async fetchPRD(config: Record<string, unknown>): Promise<PRDRequirement[]> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _localConfig = config as LocalFileConfig
+    const _localConfig = config as unknown as LocalFileConfig
 
     // In production: fs.readFileSync(_localConfig.prdFilePath) + JSON.parse
     // For TDD green phase: return mock requirements
@@ -73,7 +73,7 @@ export class LocalFileAdapter implements DocSourceAdapter {
   }
 
   async fetchDesignAssets(config: Record<string, unknown>): Promise<DesignAsset[]> {
-    const localConfig = config as LocalFileConfig
+    const localConfig = config as unknown as LocalFileConfig
 
     if (!localConfig.designDirPath) {
       return []
