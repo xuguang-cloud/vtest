@@ -108,4 +108,43 @@ describe('WorkerPool', () => {
     expect(pool.getActiveCount()).toBe(0)
     await pool.terminate()
   })
+
+  it('should reuse an idle worker', async () => {
+    const { WorkerPool } = await import('../worker/WorkerPool')
+    const pool = new WorkerPool(1)
+    pool.execute<string, string>({ data: 'task1' })
+    const worker = workers[0]
+    if (worker.onMessage) worker.onMessage({ id: '1', result: 'ok' })
+    pool.execute<string, string>({ data: 'task2' })
+    expect(workers).toHaveLength(1)
+    expect(worker.posted).toHaveLength(2)
+    await pool.terminate()
+  })
+
+  it('should handle worker error events', async () => {
+    const { WorkerPool } = await import('../worker/WorkerPool')
+    const pool = new WorkerPool(1)
+    pool.execute<string, string>({ data: 'task' })
+    const worker = workers[0]
+    expect(worker.onError).toBeDefined()
+    if (worker.onError) {
+      worker.onError(new Error('worker error'))
+    }
+    expect(pool.getActiveCount()).toBe(0)
+    await pool.terminate()
+  })
+
+  it('should handle worker exit events', async () => {
+    const { WorkerPool } = await import('../worker/WorkerPool')
+    const pool = new WorkerPool(1)
+    pool.execute<string, string>({ data: 'task' })
+    const worker = workers[0]
+    expect(worker.onExit).toBeDefined()
+    if (worker.onExit) {
+      worker.onExit(0)
+    }
+    expect(pool.getActiveCount()).toBe(0)
+    expect(workers).toHaveLength(1)
+    await pool.terminate()
+  })
 })

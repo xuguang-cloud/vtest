@@ -1,4 +1,4 @@
-# Dependencies
+﻿# Dependencies
 node_modules/
 
 # Build outputs
@@ -60,3 +60,9 @@ out/
 
 # Test reports
 reports/
+
+# npm lock file (project uses pnpm)
+package-lock.json
+
+# Local secrets
+.vtest-master-key
