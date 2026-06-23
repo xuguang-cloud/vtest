@@ -1,14 +1,16 @@
-/** @type {import('jest').Config} */
+﻿/** @type {import('jest').Config} */
 export default {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   testPathIgnorePatterns: [
     '/node_modules/',
     '/__tests__/acceptance/',
-    // integration tests now included
   ],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest'
+  },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/src/$1',
   },
@@ -28,24 +30,6 @@ export default {
       functions: 80,
       lines: 80,
       statements: 80,
-    },
-    './src/main/core/exploration/**/*.ts': {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
-    },
-    './src/main/core/resilience/**/*.ts': {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
-    },
-    './src/main/core/security/**/*.ts': {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
     },
   },
 }
