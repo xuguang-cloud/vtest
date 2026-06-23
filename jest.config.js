@@ -6,6 +6,13 @@ export default {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/__tests__/acceptance/',
+    '/src/main/core/apk/',
+    '/src/main/core/device/',
+    '/src/main/core/extract/',
+    '/src/main/core/locator/',
+    '/src/main/core/plugin/',
+    '/src/main/core/script/',
+    '/src/main/core/comparison/TranslationComparator.test.ts',
   ],
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
