@@ -1,7 +1,14 @@
-import { contextBridge, ipcRenderer } from 'electron'
+﻿import { contextBridge, ipcRenderer } from 'electron'
 
 // 定义允许的IPC通道白名单
-const VALID_INVOKE_CHANNELS = ['exploration:start', 'oauth:authorize', 'oauth:token', 'project:list', 'project:load', 'avd:list', 'avd:start', 'logger:info', 'logger:error']
+const VALID_INVOKE_CHANNELS = [
+  'exploration:start', 'oauth:authorize', 'oauth:token',
+  'project:list', 'project:load', 'avd:list', 'avd:start',
+  'logger:info', 'logger:error', 'avd:stop', 'avd:getStatus',
+  'avd:rotate', 'system:getVersions', 'project:create', 'project:getAll',
+  'project:getById', 'project:update', 'project:delete',
+  'device:install', 'device:uninstall', 'device:launch'
+]
 const VALID_ON_CHANNELS = ['exploration:stateChanged', 'oauth:callback', 'logger:log']
 
 function validateChannel(channel: string, validChannels: string[]): void {
@@ -17,39 +24,18 @@ const api = {
     chrome: process.versions.chrome
   }),
 
-  // OAuth相关
-  oauthAuthorize: (params: unknown) => {
-    return ipcRenderer.invoke('oauth:authorize', params)
-  },
-  oauthToken: (params: unknown) => {
-    return ipcRenderer.invoke('oauth:token', params)
-  },
+  oauthAuthorize: (params: unknown) => ipcRenderer.invoke('oauth:authorize', params),
+  oauthToken: (params: unknown) => ipcRenderer.invoke('oauth:token', params),
 
-  // 项目相关
-  projectList: () => {
-    return ipcRenderer.invoke('project:list')
-  },
-  projectLoad: (id: string) => {
-    return ipcRenderer.invoke('project:load', id)
-  },
+  projectList: () => ipcRenderer.invoke('project:list'),
+  projectLoad: (id: string) => ipcRenderer.invoke('project:load', id),
 
-  // AVD相关
-  avdList: () => {
-    return ipcRenderer.invoke('avd:list')
-  },
-  avdStart: (name: string) => {
-    return ipcRenderer.invoke('avd:start', name)
-  },
+  avdList: () => ipcRenderer.invoke('avd:list'),
+  avdStart: (name: string) => ipcRenderer.invoke('avd:start', name),
 
-  // 日志相关
-  loggerInfo: (message: string) => {
-    return ipcRenderer.invoke('logger:info', message)
-  },
-  loggerError: (message: string) => {
-    return ipcRenderer.invoke('logger:error', message)
-  },
+  loggerInfo: (message: string) => ipcRenderer.invoke('logger:info', message),
+  loggerError: (message: string) => ipcRenderer.invoke('logger:error', message),
 
-  // 通用invoke（带白名单校验）
   invoke: (channel: string, ...args: unknown[]) => {
     validateChannel(channel, VALID_INVOKE_CHANNELS)
     return ipcRenderer.invoke(channel, ...args)
@@ -62,12 +48,12 @@ const api = {
     return () => ipcRenderer.removeListener(channel, wrappedListener)
   },
 
-  // 探索功能
   onExplorationStateChanged: (callback: (status: unknown) => void) => {
     const listener = (_: unknown, status: unknown) => callback(status)
     ipcRenderer.on('exploration:stateChanged', listener)
     return () => ipcRenderer.removeListener('exploration:stateChanged', listener)
   },
+
   startExploration: () => ipcRenderer.invoke('exploration:start')
 }
 
